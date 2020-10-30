@@ -1,0 +1,29 @@
+{
+  "name": "dynamo-tools",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vinarius/dynamo-tools.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/vinarius/dynamo-tools/issues"
+  },
+  "homepage": "https://github.com/vinarius/dynamo-tools#readme",
+  "dependencies": {
+    "aws-sdk": "^2.782.0",
+    "csvtojson": "^2.0.10"
+  },
+  "devDependencies": {
+    "@types/node": "^14.14.6",
+    "ts-node": "^9.0.0",
+    "typescript": "^4.0.5"
+  }
+}
