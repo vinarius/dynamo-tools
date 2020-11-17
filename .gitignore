@@ -1,3 +1,5 @@
 node_modules
 insert-batch-data/insert.sh
 scanTableToJson/scanTableToJson.sh
+data
+scanTableToJson.sh
