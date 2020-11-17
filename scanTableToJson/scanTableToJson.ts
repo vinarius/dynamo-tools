@@ -9,6 +9,7 @@ import { writeFileSync, mkdirSync, existsSync } from 'fs';
         if(process.env['APPLICATION'] === undefined) unsetEnvVars.push('APPLICATION');
         if(process.env['ENVIRONMENT'] === undefined) unsetEnvVars.push('ENVIRONMENT');
         if(process.env['SOURCE_TABLE_NAME'] === undefined) unsetEnvVars.push('SOURCE_TABLE_NAME');
+        if(process.env['DESTINATION_TABLE_NAME'] === undefined) unsetEnvVars.push('DESTINATION_TABLE_NAME');
         if(process.env['REGION'] === undefined) unsetEnvVars.push('REGION');
 
         if(unsetEnvVars.length > 0) {
@@ -21,6 +22,7 @@ import { writeFileSync, mkdirSync, existsSync } from 'fs';
         const application: string = process.env['APPLICATION'] ?? '';
         const environment: string = process.env['ENVIRONMENT'] ?? '';
         const sourceTableName: string = process.env['SOURCE_TABLE_NAME'] ?? '';
+        const destinationTableName: string = process.env['DESTINATION_TABLE_NAME'] ?? '';
         const region: string = process.env['REGION'] ?? '';
 
         const ddb: DynamoDB = new DynamoDB({
@@ -37,7 +39,7 @@ import { writeFileSync, mkdirSync, existsSync } from 'fs';
         // 2 - Normalize data and output to .json to how aws.dynamodb.batch-write-item expects input
         let fileCounter: number = 1;
         const jsonConstructorObject: DynamoDB.BatchWriteItemRequestMap = {};
-        jsonConstructorObject['data'] = [];
+        jsonConstructorObject[destinationTableName] = [];
 
         for (let i:number = 0; i < scanData.Items.length; i++) {
             const data: DynamoDB.AttributeMap = scanData.Items[i];
@@ -47,17 +49,17 @@ import { writeFileSync, mkdirSync, existsSync } from 'fs';
                 }
             };
 
-            if(jsonConstructorObject['data'].length === 25) {
+            if(jsonConstructorObject[destinationTableName].length === 25) {
                 if(!existsSync(directoryName)) mkdirSync(directoryName);
                 writeFileSync(`${directoryName}/${client}-${project}-${application}-dynamo-${fileCounter}.json`, JSON.stringify(jsonConstructorObject));
                 fileCounter++;
-                jsonConstructorObject['data'] = [];
+                jsonConstructorObject[destinationTableName] = [];
             }
             
-            jsonConstructorObject['data'].push(putRequest);
+            jsonConstructorObject[destinationTableName].push(putRequest);
         }
 
-        if(jsonConstructorObject['data'].length > 0) {
+        if(jsonConstructorObject[destinationTableName].length > 0) {
             if(!existsSync(directoryName)) mkdirSync(directoryName);
             writeFileSync(`${directoryName}/${client}-${project}-${environment}-dynamo-${fileCounter}.json`, JSON.stringify(jsonConstructorObject));
         }
