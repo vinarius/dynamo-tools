@@ -29,7 +29,7 @@ import { writeFileSync, mkdirSync, existsSync } from 'fs';
             region
         });
 
-        const directoryName: string = `${application}-data`.toLowerCase();
+        const directoryName: string = `data`;
 
         // 1 - Get data from source
         const scanData: DynamoDB.ScanOutput = await ddb.scan({
