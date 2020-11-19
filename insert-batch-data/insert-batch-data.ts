@@ -24,7 +24,7 @@ const dynamoTableName: string = process.env['TABLE_NAME'] ?? '';
 (async function(){
   try {
       const batchWrites = [];
-      const directory: string = 'admin-data';
+      const directory: string = 'data';
       const files: string[] = readdirSync(`../scanTableToJson/${directory}`);
 
       files.forEach(file => {
