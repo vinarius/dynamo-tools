@@ -2,3 +2,4 @@ node_modules
 insert-batch-data/insert.sh
 scanTableToJson/scanTableToJson.sh
 data
+connectApi/test.sh

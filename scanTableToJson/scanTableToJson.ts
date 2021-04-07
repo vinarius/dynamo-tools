@@ -1,12 +1,9 @@
 import { DynamoDB } from 'aws-sdk';
-import { writeFileSync, mkdirSync, existsSync } from 'fs';
+import { writeFileSync, mkdirSync, existsSync, rmSync } from 'fs';
 
 (async () => {
     try {
         const unsetEnvVars = [];
-        if(process.env['CLIENT'] === undefined) unsetEnvVars.push('CLIENT');
-        if(process.env['PROJECT'] === undefined) unsetEnvVars.push('PROJECT');
-        if(process.env['APPLICATION'] === undefined) unsetEnvVars.push('APPLICATION');
         if(process.env['ENVIRONMENT'] === undefined) unsetEnvVars.push('ENVIRONMENT');
         if(process.env['SOURCE_TABLE_NAME'] === undefined) unsetEnvVars.push('SOURCE_TABLE_NAME');
         if(process.env['DESTINATION_TABLE_NAME'] === undefined) unsetEnvVars.push('DESTINATION_TABLE_NAME');
@@ -17,9 +14,6 @@ import { writeFileSync, mkdirSync, existsSync } from 'fs';
             process.exit(1);
         }
 
-        const client: string = process.env['CLIENT'] ?? '';
-        const project: string = process.env['PROJECT'] ?? '';
-        const application: string = process.env['APPLICATION'] ?? '';
         const environment: string = process.env['ENVIRONMENT'] ?? '';
         const sourceTableName: string = process.env['SOURCE_TABLE_NAME'] ?? '';
         const destinationTableName: string = process.env['DESTINATION_TABLE_NAME'] ?? '';
@@ -50,8 +44,12 @@ import { writeFileSync, mkdirSync, existsSync } from 'fs';
             };
 
             if(jsonConstructorObject[destinationTableName].length === 25) {
-                if(!existsSync(directoryName)) mkdirSync(directoryName);
-                writeFileSync(`${directoryName}/${client}-${project}-${application}-dynamo-${fileCounter}.json`, JSON.stringify(jsonConstructorObject));
+                if(existsSync(directoryName)) rmSync(directoryName, {
+                    force: true,
+                    recursive: true
+                });
+                mkdirSync(directoryName);
+                writeFileSync(`${directoryName}/${environment}-${fileCounter}.json`, JSON.stringify(jsonConstructorObject));
                 fileCounter++;
                 jsonConstructorObject[destinationTableName] = [];
             }
@@ -60,8 +58,12 @@ import { writeFileSync, mkdirSync, existsSync } from 'fs';
         }
 
         if(jsonConstructorObject[destinationTableName].length > 0) {
-            if(!existsSync(directoryName)) mkdirSync(directoryName);
-            writeFileSync(`${directoryName}/${client}-${project}-${environment}-dynamo-${fileCounter}.json`, JSON.stringify(jsonConstructorObject));
+            if(existsSync(directoryName)) rmSync(directoryName, {
+                force: true,
+                recursive: true
+            });
+            mkdirSync(directoryName);
+            writeFileSync(`${directoryName}/${environment}-${fileCounter}.json`, JSON.stringify(jsonConstructorObject));
         }
 
         console.log('Write complete');
