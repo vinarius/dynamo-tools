@@ -23,7 +23,7 @@ import { writeFileSync, mkdirSync, existsSync, rmSync } from 'fs';
             region
         });
 
-        const directoryName: string = `data`;
+        const directoryName = 'data';
 
         // 1 - Get data from source
         const scanData: DynamoDB.ScanOutput = await ddb.scan({
@@ -35,6 +35,7 @@ import { writeFileSync, mkdirSync, existsSync, rmSync } from 'fs';
         const jsonConstructorObject: DynamoDB.BatchWriteItemRequestMap = {};
         jsonConstructorObject[destinationTableName] = [];
 
+        let directoryMade = false;
         for (let i:number = 0; i < scanData.Items.length; i++) {
             const data: DynamoDB.AttributeMap = scanData.Items[i];
             const putRequest: DynamoDB.WriteRequest = {
@@ -44,11 +45,20 @@ import { writeFileSync, mkdirSync, existsSync, rmSync } from 'fs';
             };
 
             if(jsonConstructorObject[destinationTableName].length === 25) {
-                if(existsSync(directoryName)) rmSync(directoryName, {
-                    force: true,
-                    recursive: true
-                });
-                mkdirSync(directoryName);
+                if(existsSync(directoryName) && !directoryMade) {
+                    rmSync(directoryName, {
+                        force: true,
+                        recursive: true
+                    });
+                    mkdirSync(directoryName);
+                    directoryMade = true;
+                }
+
+                if(!existsSync(directoryName) && !directoryMade) {
+                    mkdirSync(directoryName);
+                    directoryMade = true;
+                }
+
                 writeFileSync(`${directoryName}/${environment}-${fileCounter}.json`, JSON.stringify(jsonConstructorObject));
                 fileCounter++;
                 jsonConstructorObject[destinationTableName] = [];
@@ -58,11 +68,20 @@ import { writeFileSync, mkdirSync, existsSync, rmSync } from 'fs';
         }
 
         if(jsonConstructorObject[destinationTableName].length > 0) {
-            if(existsSync(directoryName)) rmSync(directoryName, {
-                force: true,
-                recursive: true
-            });
-            mkdirSync(directoryName);
+            if(existsSync(directoryName) && !directoryMade) {
+                rmSync(directoryName, {
+                    force: true,
+                    recursive: true
+                });
+                mkdirSync(directoryName);
+                directoryMade = true;
+            }
+
+            if(!existsSync(directoryName) && !directoryMade) {
+                mkdirSync(directoryName);
+                directoryMade = true;
+            }
+            
             writeFileSync(`${directoryName}/${environment}-${fileCounter}.json`, JSON.stringify(jsonConstructorObject));
         }
 
