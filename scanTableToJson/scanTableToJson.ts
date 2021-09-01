@@ -19,11 +19,11 @@ if (unsetEnvVars.length > 0) {
 
 (async () => {
   try {
-    const sourceEnv: string = process.env['SOURCE_ENV'];
-    const sourceTableName: string = process.env['SOURCE_TABLE_NAME'];
-    const destinationTableName: string = process.env['DESTINATION_TABLE_NAME'];
-    const region: string = process.env['REGION'];
-    const project: string = process.env['PROJECT'];
+    const sourceEnv: string = process.env['SOURCE_ENV'] ?? '';
+    const sourceTableName: string = process.env['SOURCE_TABLE_NAME'] ?? '';
+    const destinationTableName: string = process.env['DESTINATION_TABLE_NAME'] ?? '';
+    const region: string = process.env['REGION'] ?? '';
+    const project: string = process.env['PROJECT'] ?? '';
 
     const ddb: DynamoDB = new DynamoDB({
       region
@@ -34,7 +34,7 @@ if (unsetEnvVars.length > 0) {
 
     // 1 - Get data from source
     let nextToken = undefined;
-    let scanData = [];
+    let scanData: DynamoDB.ItemList = [];
     do {
       const scanOutput: DynamoDB.ScanOutput = await ddb.scan({
         TableName: sourceTableName,
@@ -43,7 +43,7 @@ if (unsetEnvVars.length > 0) {
       nextToken = scanOutput.LastEvaluatedKey;
       scanData = [
         ...scanData,
-        ...scanOutput.Items
+        ...scanOutput.Items as DynamoDB.ItemList
       ]
     } while(nextToken);
 

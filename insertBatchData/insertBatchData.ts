@@ -17,17 +17,17 @@ if (unsetEnvVars.length > 0) {
   process.exit(1);
 }
 
-const region: string = process.env['DESTINATION_REGION'];
+const region: string = process.env['DESTINATION_REGION'] ?? '';
 const dynamoDb = new DynamoDB({
   region
 });
-const dynamoTableName: string = process.env['DESTINATION_TABLE_NAME'];
+const dynamoTableName: string = process.env['DESTINATION_TABLE_NAME'] ?? '';
 
 (async function () {
   try {
-    const sourceEnv = process.env.SOURCE_ENV;
-    const project = process.env.PROJECT;
-    const batchWrites = [];
+    const sourceEnv = process.env.SOURCE_ENV as string;
+    const project = process.env.PROJECT as string;
+    const batchWrites: Promise<DynamoDB.BatchWriteItemOutput>[] = [];
     const dataDirectoryPath: string = resolve(__dirname, '..', 'scanTableToJson', 'backups', project, sourceEnv);
     const files: string[] = readdirSync(dataDirectoryPath);
 
